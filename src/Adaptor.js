@@ -1,8 +1,6 @@
-import {execute as commonExecute, expandReferences} from 'language-common';
-import request from 'request';
-import {resolve as resolveUrl} from 'url';
-
 /** @module Adaptor */
+import {execute as commonExecute, expandReferences, composeNextState } from 'language-common';
+import Nexmo from 'nexmo';
 
 /**
  * Execute a sequence of operations.
@@ -32,55 +30,45 @@ export function execute(...operations) {
 }
 
 /**
- * Make a POST request
+ * Sends an SMS message to a specific phone number
+ * @public
  * @example
- * execute(
- *   post(params)
- * )(state)
- * @constructor
- * @param {object} params - data to make the fetch
+ * sendSMS("OpenFn", "phoneNumber", "Hello World!")
+ * @function
+ * @param {String} from - Name or number the message should be sent from.
+ * @param {String} toNumber - Destination phone number.
+ * @param {String} message - Text message
  * @returns {Operation}
  */
-export function post(params) {
+export function sendSMS(from, toNumber, message) {
 
   return state => {
 
-    function assembleError({response, error}) {
-      if (response && ([200, 201, 202].indexOf(response.statusCode) > -1))
-        return false;
-      if (error)
-        return error;
-      return new Error(`Server responded with ${response.statusCode}`)
-    }
+    const { apiKey, apiSecret } = state.configuration;
 
-    const {url, body, headers} = expandReferences(params)(state);
+    const nexmo = new Nexmo({
+      apiKey: apiKey,
+      apiSecret: apiSecret
+    })
 
     return new Promise((resolve, reject) => {
-      console.log("Request body:");
-      console.log("\n" + JSON.stringify(body, null, 4) + "\n");
-      request.post({
-        url: url,
-        json: body,
-        headers
-      }, function(error, response, body) {
-        error = assembleError({error, response})
-        if (error) {
-          reject(error);
-          console.log(response);
-        } else {
-          console.log("Printing response...\n");
-          console.log(JSON.stringify(response, null, 4) + "\n");
-          console.log("POST succeeded.");
-          resolve(body);
-        }
-      })
-    }).then((data) => {
-      const nextState = {
-        ...state,
-        response: {
-          body: data
-        }
-      };
+
+      nexmo.message.sendSms(from, toNumber, message,
+        (error, response) => {
+          if(error) {
+            console.error(error)
+            reject(error)
+          } else if(response.messages[0].status != '0') {
+            console.error("Nexmo Error:")
+            console.error(response)
+            reject(response)
+          } else {
+            console.log(response);
+            resolve(response)
+          }
+        })
+    }).then((response) => {
+      const nextState = composeNextState(state, response);
       return nextState;
     })
 

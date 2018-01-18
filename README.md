@@ -1,30 +1,27 @@
-Language Template [![Build Status](https://travis-ci.org/OpenFn/language-template.svg?branch=master)](https://travis-ci.org/OpenFn/language-template)
+Language Nexmo [![Build Status](https://travis-ci.org/OpenFn/language-nexmo.svg?branch=master)](https://travis-ci.org/OpenFn/language-nexmo)
 =================
 
 Language Pack for building expressions and operations to interact with the Nexmo API.
 
 Documentation
 -------------
-## post
+## sendSMS
 
 #### sample configuration
 ```json
 {
-  "username": "taylor@openfn.org",
-  "password": "supersecret"
+  "apiKey": "mYaP1K3y",
+  "apiSecret": "supersecret"
 }
 ```
 
-#### sample expression using operation
+#### sample expression
 ```js
-post({
-  "url": "api/v1/forms/data/wide/json/formId",
-  "body": {"a":1}
-  "headers": {}
-})
+sendSMS(
+  "OpenFn",
+  "0123456789",
+  "HelloWorld!")
 ```
-
-[Docs](docs/index)
 
 Development
 -----------

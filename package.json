@@ -18,7 +18,6 @@
     "request": "^2.81.0"
   },
   "devDependencies": {
-    "nexmo": "^2.1.1",
     "assertion-error": "^1.0.1",
     "babel": "^6.0.15",
     "babel-cli": "^6.1.2",
@@ -30,6 +29,7 @@
     "esdoc": "^0.5.2",
     "esdoc-es7-plugin": "0.0.3",
     "mocha": "^2.3.3",
+    "nexmo": "2.1.1",
     "nock": "^8.0.0",
     "sinon": "^1.17.2"
   }
